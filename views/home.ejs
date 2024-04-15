@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        tr,td,th{
+            border:solid red 1px;
+        }
+    </style>
+</head>
+<body>
+    <h1>LIST OF ALL USERS</h1>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Id</th>
+            <th>Password</th>
+        </tr>
+        <%for(user of result){%>
+        <tr>
+                <td><%=user.name%></td>
+                <td><%=user.id%></td>
+                <td><%=user.password%></td>
+        </tr>
+        <%}%>
+    </table>
+    
+</body>
+</html>

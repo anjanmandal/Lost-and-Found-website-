@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Display</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5; /* Background color */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow effect */
+        }
+
+        .image-wrapper {
+            text-align: center;
+        }
+
+        .image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+          
+        }
+
+        .caption {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="image-wrapper">
+            <img src="<%= filePath %>" class="image" alt="Uploaded Image">
+        </div>
+        <div class="caption">
+            <p>This is the uploaded image.</p>
+        </div>
+    </div>
+</body>
+</html>
