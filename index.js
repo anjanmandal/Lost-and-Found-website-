@@ -23,14 +23,21 @@ const storage=multer.diskStorage({
         return cb(null,`${Date.now()}-${file.originalname}`);
     }
 });
-const upload=multer({storage});
+
 app.use(express.static(path.join(__dirname, 'uploads')));
-
-
-
-
+const upload = multer({ storage: storage }).single('image');  // Ensure 'post_picture' is the correct field name
 
 //--------------------------------------------
+
+//----------------------=====sessions---------------
+const session = require('express-session');
+
+app.use(session({
+    secret: 'some_secret_key',  // Change this to a more secure key
+    resave: false,
+    saveUninitialized: false,
+}));
+//----------------------------------------------
 app.listen(port,()=>{
     console.log(`listening to the port ${port}`)
 })
@@ -41,12 +48,7 @@ const connection= mysql.createConnection({
     password:'Anjan@$12345',
     port:3306,
 });
-app.get("/user",(req,res)=>{
-    connection.query(`SELECT * FROM users`,(err,result)=>{
-        if(err)throw err;
-        res.render("home.ejs",{result});
-    })
-})
+
 app.get("/",(req,res)=>{
     res.render("homepage.ejs");
 })
@@ -75,57 +77,75 @@ app.post("/submit", (req, res) => {
 });
 
 //-------------------------------login--------------------------
+
+
 app.post("/submit-your-login-form", (req, res) => {
     let { username, password } = req.body;
-    let q = `SELECT * FROM list WHERE email='${username}' AND password='${password}'`;
-    connection.query(q, (err, result) => {
+    let q = "SELECT * FROM list WHERE email = ? AND password = ?";
+    connection.query(q, [username, password], (err, result) => {
         if (err) {
             console.log(err);
             res.status(500).send("Error occurred while logging in");
+        } else if (result.length === 0) {
+            res.render("loginIncorrect.ejs", { message: "Incorrect username or Password" });
         } else {
-            if (result.length === 0) {
-                // No matching user found
-                let {message}="Incorrect username or Password"
-                res.render("loginIncorrect.ejs",{message})
-            } else {
-                // User found, password correct
-                console.log(result);
-                res.render("user.ejs",{username})
-            }
+            req.session.userId = result[0].user_id;  // Store user_id in session
+            res.redirect("/user");
         }
     });
 });
-
-//======================lost page=========================
-
-
 app.get("/lost",(req,res)=>{
-    res.render("lost.ejs")
+    res.render("lost.ejs");
 })
+app.post('/postlost', upload, (req, res) => {
+    if (!req.session.userId) {
+        return res.redirect("/login");  // Ensuring user is logged in
+    }
 
-///=============================image part===============
-app.post("/postlost", upload.array('image', 10), (req, res) => {
-    const { email, password } = req.body;
-    const files = req.files;
+    // Extract text fields
+    const { post_content,color } = req.body;
+    const image = req.file;
+    const imagePath=`../${image.filename}`;
+    console.log(imagePath)  // Using the path from the uploaded file
+    const user_id = req.session.userId;
 
-    // Assuming there's only one file uploaded per request
-    const filename = files[0]
-
-    // Construct the file path
-    const filePath = `../${filename.filename}`;
-
-    // Update the filename in the list table for the user with the specified email and password
-    const q = `UPDATE list SET filename = ? WHERE email = ? AND password = ?`;
-
-    connection.query(q, [filePath, email, password], (err, result) => {
+    let q = "INSERT INTO posts (user_id, post_content, post_picture, color) VALUES (?, ?, ?, ?)";
+    connection.query(q, [user_id, post_content, imagePath, color], (err, result) => {
         if (err) {
             console.log(err);
-            return res.send("Error occurred while updating filename");
+            res.status(500).send("Error occurred while posting item");
+        } else {
+            res.redirect("/user");  // Redirect to user profile or another appropriate page
         }
-
-        // Render a webpage with the uploaded image displayed
-        console.log(filePath)
-        res.redirect("/homepage.ejs",{filePath});
     });
 });
-app.get("/homepage")
+
+app.get("/user", (req, res) => {
+    if (!req.session.userId) {
+        // Redirect to login page if the user is not logged in
+        return res.redirect("/login");
+    }
+
+    const user_id = req.session.userId;
+    // Query to fetch posts along with user name from the 'list' table
+    const q = `
+        SELECT posts.*, list.name as user_name
+        FROM posts
+        JOIN list ON posts.user_id = list.user_id
+        WHERE posts.user_id = ?
+        ORDER BY posts.post_date DESC
+    `;
+
+    connection.query(q, [user_id], (err, results) => {
+        if (err) {
+            console.log(err);
+            res.status(500).send("Error occurred while fetching your posts");
+        } else {
+            posts=results;
+        }
+        res.render("user.ejs", { posts: posts, username: req.session.userName });
+       
+        
+    });
+});
+
