@@ -1,0 +1,41 @@
+DATABASE DESCRIPTION AND TABLES
+CREATE TABLE list(
+user_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(60),
+    email VARCHAR(60),
+    password VARCHAR(60),
+    created_at TIMESTAMP DEFAULT current_timestamp
+    
+);
+CREATE TABLE posts (
+    post_id INT auto_increment PRIMARY KEY,
+    user_id INT,
+    post_content TEXT,
+    post_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    post_picture VARCHAR(200),
+    color VARCHAR(50),
+     item_category VARCHAR(100),
+    item_make VARCHAR(100),
+    item_model VARCHAR(100),
+    location_lost VARCHAR(255),
+    FOREIGN KEY (user_id) REFERENCES list(user_id)
+);
+CREATE TABLE Claims (
+    claim_id INT AUTO_INCREMENT PRIMARY KEY,
+    post_id INT,
+    claimer_id INT,
+    claim_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    security_questions TEXT,
+    claim_status VARCHAR(50),
+    FOREIGN KEY (post_id) REFERENCES Posts(post_id),
+    FOREIGN KEY (claimer_id) REFERENCES list(user_id)
+);
+CREATE TABLE Chats (
+    chat_id INT AUTO_INCREMENT PRIMARY KEY,
+    sender_id INT,
+    receiver_id INT,
+    message TEXT,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (sender_id) REFERENCES list(user_id),
+    FOREIGN KEY (receiver_id) REFERENCES list(user_id)
+);
