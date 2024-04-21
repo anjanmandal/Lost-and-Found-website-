@@ -25,8 +25,9 @@ const storage=multer.diskStorage({
 });
 
 app.use(express.static(path.join(__dirname, 'uploads')));
-const upload = multer({ storage: storage }).single('image');  // Ensure 'post_picture' is the correct field name
-
+const upload = multer({ storage: storage }).single('itemImage');  
+//NOTE: each time you take file input you have to make sure that when you take input file the name property
+//of the file must math in .single(name property)
 //--------------------------------------------
 
 //----------------------=====sessions---------------
@@ -36,6 +37,7 @@ app.use(session({
     secret: 'some_secret_key',  // Change this to a more secure key
     resave: false,
     saveUninitialized: false,
+    cookie:{secure:false}
 }));
 //----------------------------------------------
 app.listen(port,()=>{
@@ -63,6 +65,7 @@ app.get("/signup",(req,res)=>{
 });
 
 app.post("/submit", (req, res) => {
+    console.log("Hello")
     let {name, email, password } = req.body;
     let q = "INSERT INTO list (name, email, password) VALUES (?,?,?)";
     let list = [name, email, password];
@@ -71,6 +74,7 @@ app.post("/submit", (req, res) => {
             console.log(err); // Handle the error properly
             res.status(500).send("Error occurred while adding user"); // Send an error response
         } else {
+            
             res.render("login.ejs")
         }
     });
@@ -90,6 +94,7 @@ app.post("/submit-your-login-form", (req, res) => {
             res.render("loginIncorrect.ejs", { message: "Incorrect username or Password" });
         } else {
             req.session.userId = result[0].user_id;  // Store user_id in session
+            req.session.name=result[0].name;
             res.redirect("/user");
         }
     });
@@ -143,9 +148,73 @@ app.get("/user", (req, res) => {
         } else {
             posts=results;
         }
-        res.render("user.ejs", { posts: posts, username: req.session.userName });
+        res.render("user.ejs", { posts: posts, username: req.session.name });
        
         
     });
 });
+
+//-------------------------ALL THE POSTS USER HAD MADE-----------------------------//
+app.get("/posts",(req,res)=>{
+    const userID=req.session.userId;
+    if(!userID){
+        return res.status(400).json({ error: 'User ID is required' });
+    }
+    const sql=`SELECT * FROM posts WHERE user_id = ?`;
+    connection.query(sql,[userID],(err,results)=>{
+        if(err){
+            console.error('Failed to retrieve posts: ' + err);
+            return res.status(500).json({ error: 'Database query failed' });
+        }
+        console.log(results);
+        res.render("myPosts.ejs",{posts:results});
+    })
+})
+//------------------------ENABLING USER TO POST THE FOUND Items--------------------//
+app.get("/found",(req,res)=>{
+    res.render("uploadLostItem.ejs")
+})
+     //---UPDATING DATABASE BASED ON THE USER RESPONSE TO POST LOST ITEM-----
+app.post("/uploadPost",upload,(req,res)=>{
+    if (!req.session.userId) {
+        return res.redirect("/login");  // Ensuring user is logged in
+    }
+
+    const image = req.file;
+    console.log(image);
+    console.log(req.body);
+    const imagePath=`../${image.filename}`;
+    let {itemName,itemColor,itemCategory,itemMake,itemModel,address}=req.body;
+    console.log(imagePath)
+  
+    let q=`INSERT INTO posts (user_id,post_content,post_picture,color,item_category,item_make,item_model,location_lost) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+    connection.query(q,[req.session.userId,itemName,imagePath,itemColor,itemCategory,itemMake,itemModel,address],(err,results)=>{
+        if (err) {
+            console.log(err);
+            res.status(500).send("Error occurred while posting item");
+        } else {
+            let q = 'SELECT * FROM posts WHERE user_id = ?'; // Query to get all posts for the logged-in user
+            connection.query(q, [req.session.userId], (err, results) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).send("Error retrieving posts");
+                }
+                if (results.length > 0) {
+                    res.render('myPosts.ejs', { posts: results });
+                } else {
+                    res.render('myPosts.ejs', { posts: [] });
+                    console.log("No posts found for user:", req.session.userId);
+                }
+             }); // Redirect to user profile or another appropriate page
+        }
+
+    });
+
+
+
+
+
+
+    
+})
 

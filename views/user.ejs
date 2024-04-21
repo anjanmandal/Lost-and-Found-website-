@@ -10,125 +10,175 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #fff; /* Set background to white */
+            background-color: #5e3d9c;
             color: #333;
-            transition: background-color 0.5s, color 0.5s;
         }
         
-        .dark {
+        .dark-mode {
             background-color: #333;
             color: #f4f4f9;
         }
         
         header {
-            background-color: #007BFF;
-            color: white;
+            background-color: #5e3d9c;
+            color: rgb(162, 133, 232);
             padding: 10px 20px;
             text-align: center;
-            position: relative;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Add shadow to header */
-        }
-        
-        .blur-header nav {
-            backdrop-filter: blur(5px); /* Blurry effect for the navbar */
-            position: absolute;
+            position: fixed;
             width: 100%;
             top: 0;
             left: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-        
-        nav ul {
+
+        .blur-effect {
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-container {
             list-style: none;
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
+            align-items: center;
             padding: 0;
             margin: 0;
+            height:40px;
         }
+        .nav-items{
+            display:flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            list-style:none;
+        }
+        .nav-items a {
+            margin-right: 20px; /* Add right margin to create gap between the items */
+        }
+       
+     
         
-        nav a {
-            color: white;
+        nav a, .menu-icon {
+          
+            color:white;
             text-decoration: none;
             font-weight: bold;
+            cursor: pointer;
+           
         }
-        
-        .username-icon {
-            margin-right: 5px; /* Space between icon and username */
+        li span{
+            position: relative;
+            right:30px;
         }
-        
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            padding: 12px;
+            z-index: 1001;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .main {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+     
+        }
+
         .post {
-            margin: 20px auto;
-            padding: 10px;
             border: 1px solid #ccc;
             border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            width: 80%; /* Control post width */
-            max-width: 600px; /* Max width for large screens */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 10px;
+            background-color: white;
+            width:100%;
+            grid-template: 50px 50px 50px;
         }
-        
+        .image-container{
+            width:50%;
+            height:50%;
+        }
+
         .post-image {
-            width: 100%;
-            height: auto;
-            object-fit: cover;
-        }
-        
-        .color-tag {
-            display: inline-block;
-            padding: 5px 10px;
-            background-color: #666; /* Color tag background */
-            color: #fff;
+            width: 50%;
+            height: 50%;
             border-radius: 4px;
-        }
-        
-        .btn.claim {
+            border-radius: 4px;
+            object-fit: cover;
+            border: 1px solid #ccc; /* Adding a light grey border */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15); /* Adding a subtle shadow for depth */
+}
+
+        .btn {
             padding: 8px 16px;
-            background-color: green;
+            background-color: #28a745;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
         }
-        
-        .btn.claim:hover {
-            background-color: darkgreen;
+
+        .btn:hover {
+            background-color: #218838;
         }
-        
+
         footer {
             text-align: center;
             padding: 10px;
             background-color: #ddd;
-            position: fixed;
             bottom: 0;
             width: 100%;
         }
     </style>
 </head>
-<body class="light">
+<body>
     <header>
-        <h1>Welcome to Lost & Found Hub</h1>
-        <nav class="blur-header">
-            <ul>
-                <li><a href="/user"><i class="fas fa-user-circle username-icon"></i><%= username %></a></li>
-                <li><a href="/lost">Report Lost Item</a></li>
-                <li><a href="/found">Report Found Item</a></li>
-                <li><label class="theme-switcher">
-                    <input type="checkbox" id="theme-toggle">
-                    <span class="slider round"></span>
-                </label></li>
+        <nav class="blur-effect">
+            <ul class="nav-container">
+                <li><a href="/user"><i class="fas fa-user-circle"></i>&nbsp&nbsp<%=`${username}`%></a></li>
+                <li>
+                    <ul class="nav-items">
+                        <li><a href="/lost">Lost</a></li>
+                        <li><a href="/found">Found</a></li>
+                        <li><a href="/posts">Posts</a></li>
+                        <li><a href="/claim">Claim History</a></li>
+                        <li><a href="/request">Claim Request</a></li>
+                    </ul>
+                <li><span class="menu-icon"><i class="fas fa-bars"></i></span>
+                    <div class="dropdown-content">
+                        <a href="/logout">Logout</a>
+                        <a href="/about">About</a>
+                    </div>
+                </li>
             </ul>
         </nav>
     </header>
-    <main>
+    <main class="main">
         <section class="posts">
             <% if (posts.length > 0) { %>
                 <% posts.forEach(post => { %>
                     <article class="post">
+                        <div class="image-container">
                         <img src="<%= post.post_picture %>" alt="Post Image" class="post-image">
+                    </div>
                         <div class="post-content">
                             <h3>Posted by <%= post.user_name %> on <%= new Date(post.post_date).toLocaleDateString() %></h3>
                             <p><%= post.post_content %></p>
                             <p class="color-tag">Item Color: <%= post.color %></p>
                            
-                                <button class="btn claim">Claim</button>
+                                <button class="btn claim"><a href="/claim"></a>Claim</button>
+                                <button class="btn delete"><a href="/delete"></a>Delete</button>
                         
                         </div>
                     </article>
@@ -139,13 +189,13 @@
         </section>
     </main>
     <footer>
-        <p>© 2024 Lost & Found Hub. All rights reserved.</p>
-    </footer>
-    <script>
-        document.getElementById('theme-toggle').addEventListener('change', function() {
-            document.body.classList.toggle('dark');
-            document.body.classList.toggle('light');
-        });
-    </script>
-</body>
-</html>
+        <p>© 2024 Lost & Found Hub. All rights reserved.</footer>
+
+            <script>
+                document.getElementById('theme-toggle').addEventListener('change', function() {
+                    document.body.classList.toggle('dark');
+                    document.body.classList.toggle('light');
+                });
+            </script>
+        </body>
+        </html>

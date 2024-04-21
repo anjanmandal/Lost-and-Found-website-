@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Found Item</title>
+    <style>
+        :root {
+            --first-color:  #000000;
+            --second-color: #270db8;
+            --third-color: #777;
+            --hover-color: #240cc3;
+            --body-bg-color: #fefefe;
+            --card-bg-color: #fff;
+            --modal-bg-color: #fff;
+            --bg-transparent-color: rgba(0, 0, 0, 0.1);
+            --transparent-color-01: rgba(0, 0, 0, 0.1);
+            --transparent-color-02: rgba(106, 89, 209, 0.1);
+            --line-color: #d7d7d7;
+            --color-filter: invert(1);
+            --box-shadow: 0px 0px 20px rgb(0 0 0 / 10%);
+            --small-font-size: 0.9em;
+            --normal-font-size: 1em;
+            --scroll-bar-color: #c5cadf;
+            --scroll-thumb-color: #70768a;
+            --scroll-thumb-hover-color: #454f6b;
+        }
+        
+        body {
+            background-color: var(--body-bg-color);
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            width: 80%;
+            margin: 50px auto;
+            background-color: var(--card-bg-color);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .title {
+            color: var(--second-color);
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--third-color);
+        }
+        
+        input[type="file"],
+                select {
+            width: 50%;
+            padding: 10px;
+            border: 1px solid var(--line-color);
+            border-radius: 5px;
+        }
+        
+        button.submit-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--second-color);
+            color: var(--card-bg-color);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: var(--normal-font-size);
+        }
+        
+        button.submit-btn:hover {
+            background-color: var(--hover-color);
+        }
+        .form-group input{
+            padding:20px 50px;
+            border-radius: 5px;
+        }
+         option{
+            padding:50px;
+            border-radius: 5px;
+
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Upload Found Item</h1>
+        <form id="uploadForm" action="/uploadPost" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="itemImage">Item Image:</label>
+                <input type="file" id="itemImage" name="itemImage" required>
+            </div>
+            <div class="form-group">
+                <label for="itemName">Item Name:</label>
+                <input type="name" id="itemName" name="itemName" required>
+            </div>
+            <div class="form-group">
+                <label for="location">Address Found:</label>
+                <input type="address" id="address" name="address" required>
+            </div>
+            <div class="form-group">
+                <label for="itemColor">Item Color:</label>
+                <input type="text" id="itemColor" name="itemColor">
+            </div>
+            <div class="form-group">
+                <label for="itemModel">Model:</label>
+                <input type="text" id="itemModel" name="itemModel">
+            </div>
+            <div class="form-group">
+                <label for="itemMake">Make:</label>
+                <input type="text" id="itemMake" name="itemMake">
+            </div>
+           
+            <div class="form-group">
+                <label for="itemCategory">Item Category:</label>
+                <select id="itemCategory" name="itemCategory">
+                    <option value="">Select a Category</option>
+                    <!-- Example categories, replace or extend with actual categories -->
+                    <option value="electronics">Electronics</option>
+                    <option value="phone">Phone</option>
+                    <option value="iPad">ipad</option>
+                    <option value="Laptop">Laptop</option>
+                    <option value="clothing">Clothing</option>
+                    <option value="accessories">Accessories</option>
+                    <option value="books">Books</option>
+                    <option value="furniture">Furniture</option>
+                    <option value="others">Others</option>
+                    <!-- Add more categories as needed -->
+                </select>
+            </div>
+            <button type="submit" class="submit-btn">Upload</button>
+        </form>
+    </div>
+    <script>
+      
+        
+    </script>
+</body>
+</html>
