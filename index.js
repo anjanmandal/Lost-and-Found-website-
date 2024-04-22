@@ -5,8 +5,17 @@ const mysql= require("mysql2");
 app.set("view engine","ejs");
 const path=require("path");
 app.set("views",path.join(__dirname,"./views"));
+
+//-------------we need the below middleware to read the data from the post request....
 app.use(express.urlencoded({extended: true}));
 app.use(express.json())
+
+//---------------------using method override package to send delete reqest and patch request.
+
+//npm install method-override
+const methodOverride = require('method-override');
+// Override with POST having ?_method=DELETE
+app.use(methodOverride('_method'));
 
 //------------image multer package----------------
 
@@ -181,11 +190,9 @@ app.post("/uploadPost",upload,(req,res)=>{
     }
 
     const image = req.file;
-    console.log(image);
-    console.log(req.body);
     const imagePath=`../${image.filename}`;
     let {itemName,itemColor,itemCategory,itemMake,itemModel,address}=req.body;
-    console.log(imagePath)
+
   
     let q=`INSERT INTO posts (user_id,post_content,post_picture,color,item_category,item_make,item_model,location_lost) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
     connection.query(q,[req.session.userId,itemName,imagePath,itemColor,itemCategory,itemMake,itemModel,address],(err,results)=>{
@@ -208,13 +215,52 @@ app.post("/uploadPost",upload,(req,res)=>{
              }); // Redirect to user profile or another appropriate page
         }
 
+    })
+});
+    app.delete("/deletePost/:post_id", (req, res) => {
+        if (!req.session.userId) {
+            return res.status(401).send("Unauthorized");
+        }
+    
+        const postId = req.params.post_id;
+        const userId = req.session.userId;  // Ensure session is correctly set
+    
+        const query = 'DELETE FROM posts WHERE post_id = ? AND user_id = ?';
+        connection.query(query, [postId, userId], (err, result) => {
+            if (err) {
+                console.error("Failed to delete post:", err);
+                return res.status(500).send("Failed to delete the post");
+            }
+            if (result.affectedRows === 0) {
+                return res.status(404).send("Post not found or user does not have permission to delete this post");
+            }
+            res.render("/posts");
+        });
+    });
+    
+    //------------------searching the posts based on the category---------------------------
+    app.get("/searchLost",(req,res)=>{
+        if (!req.session.userId) {
+            return res.redirect("/login");  // Ensuring user is logged in
+        }
+        //console.log(req.query.category); this show the value that was selected 
+        let q=`SELECT * FROM posts WHERE item_category = ? AND user_id != ?`;
+        connection.query(q,[req.query.category,req.session.userId],(err,results)=>{
+            if (err) {
+                // Handle the error appropriately
+                console.error("Error executing query", err);
+                res.status(500).send("Error executing query");
+            }
+            res.render("allPosts.ejs",{posts:results});
+        })
+
+
     });
 
 
 
 
 
-
     
-})
+
 
