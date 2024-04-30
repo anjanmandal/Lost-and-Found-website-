@@ -256,10 +256,51 @@ app.post("/uploadPost",upload,(req,res)=>{
 
 
     });
+    app.post("/claim",(req,res)=>{
+        if(!req.session.userId){
+            return res.redirect("/login");
+        }
+        let {userId,postId}=req.body;
+        req.session.PersonId=userId;
+        req.session.personPost=postId;
+        let q=`SELECT * FROM posts WHERE post_id=?`;
+        connection.query(q,[req.session.personPost],(err,results)=>{
+            if(err){
+                console.error("Error executing query", err);
+                res.status(500).send("Error executing query");
+            }
+            console.log(results);
+            res.render("claimPage.ejs",{results});
+
+        })
+
+       
+      
+    })
+
+    app.post("/submitClaim", (req, res) => {
+        let { security_question, best_guess, specific_detail } = req.body;
+        console.log(`${security_question}         ${best_guess}      ${specific_detail}`);
+        
+        const q = `INSERT INTO Claims (post_id, claimer_id, security_questions, claim_status, address_lost, specific_question) VALUES (?, ?, ?, ?, ?, ?)`;
+        
+        connection.query(q, [req.session.personPost, req.session.userId, security_question, "Pending", best_guess, specific_detail], (err, results) => {
+            if (err) {
+                console.error("Error executing query", err);
+                // Only send a response if headers have not been sent
+                if (!res.headersSent) {
+                    res.status(500).send("Error executing query");
+                }
+                return; // Make sure to return here to prevent further execution
+            }
+            // Redirect only if there was no error
+            res.redirect("/claimHistory");
+        });
+    });
 
 
 
-
+ 
 
     
 

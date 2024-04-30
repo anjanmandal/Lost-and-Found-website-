@@ -78,7 +78,12 @@
                 <div class="card-body">
                     <h5 class="card-title">Posted on <%= post.post_date.toDateString() %></h5>
                     <p class="card-text"><%= post.post_content %></p>
-                    <button class="btn claim-button">Claim</button>
+                    <form action="/claim" method="POST">
+                        <input type="hidden" name="userId" value="<%= post.user_id %>">
+                        <input type="hidden" name="username" value="<%= post.username %>">
+                        <input type="hidden" name="postId" value="<%= post.post_id %>">
+                        <button type="submit" class="btn claim-button">Claim</button>
+                    </form>
                 </div>
             </div>
         <% }); %>

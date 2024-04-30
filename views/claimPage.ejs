@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claim Item</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue: #2C3E50;
+            --green: #18BC9C;
+            --yellow: #F39C12;
+            --white: #fff;
+            --gray: #95a5a6;
+            --primary: #2C3E50;
+            --success: #18BC9C;
+            --warning: #F39C12;
+            --light: #ecf0f1;
+            --dark: #343a40;
+            --font-family-sans-serif: "Lato", sans-serif;
+        }
+        body {
+            font-family: var(--font-family-sans-serif);
+            background-color: var(--light);
+            color: var(--dark);
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: var(--white);
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: var(--primary);
+        }
+        label {
+            display: block;
+            margin: 15px 0 5px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid var(--gray);
+            border-radius: 4px;
+        }
+        button {
+            background-color: var(--green);
+            color: var(--white);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: var(--blue);
+        }
+    </style>
+    <script>
+        function updateSecurityQuestion() {
+            var category = document.getElementById('category').value;
+            var questionField = document.getElementById('security_question');
+            switch (category) {
+                case 'electronics':
+                    questionField.value = 'What is the brand and model of the electronic device?';
+                    break;
+                case 'phone':
+                    questionField.value = 'What is the make, model, and color of the phone?';
+                    break;
+                case 'ipad':
+                    questionField.value = 'What is the storage capacity and background color of the iPad?';
+                    break;
+                case 'Laptop':
+                    questionField.value = 'What is the operating system and screen size of the laptop?';
+                    break;
+                case 'clothing':
+                    questionField.value = 'What is the type of clothing and the main color?';
+                    break;
+                case 'accessories':
+                    questionField.value = 'Describe the type of accessory and any distinctive features.';
+                    break;
+                case 'books':
+                    questionField.value = 'What is the title of the book and the author\'s name?';
+                    break;
+                case 'furniture':
+                    questionField.value = 'Describe the type of furniture and its material.';
+                    break;
+                case 'others':
+                    questionField.value = 'Please provide a detailed description of the item.';
+                    break;
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Claim Your Item</h1>
+        <% if (results.length > 0) { %>
+            <form action="/submitClaim" method="POST">
+                <label for="category">Item Category</label>
+                <select id="category" name="category" onchange="updateSecurityQuestion()">
+                    <option value="electronics">Electronics</option>
+                    <option value="phone">Phone</option>
+                    <option value="ipad">iPad</option>
+                    <option value="Laptop">Laptop</option>
+                    <option value="clothing">Clothing</option>
+                    <option value="accessories">Accessories</option>
+                    <option value="books">Books</option>
+                    <option value="furniture">Furniture</option>
+                    <option value="others">Others</option>
+                </select>
+
+                <label for="security_question">Security Question</label>
+                <textarea id="security_question" name="security_question" required>What is a unique feature of your item?</textarea>
+
+                <label for="best_guess">Where do you think you lost it?</label>
+                <input type="text" id="best_guess" name="best_guess" required>
+
+                <label for="specific_detail">Specific Detail about the Product</label>
+                <textarea id="specific_detail" name="specific_detail" required>Describe any specific feature or mark on the item.</textarea>
+
+                <button type="submit">Submit Claim</button>
+            </form>
+        <% } else { %>
+            <p>No item details available to claim. Please check the item ID or contact support.</p>
+        <% } %>
+    </div>
+</body>
+</html>
