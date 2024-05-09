@@ -234,7 +234,7 @@ app.post("/uploadPost",upload,(req,res)=>{
             if (result.affectedRows === 0) {
                 return res.status(404).send("Post not found or user does not have permission to delete this post");
             }
-            res.render("/posts");
+            res.render("/myPosts");
         });
     });
     
@@ -271,7 +271,6 @@ app.post("/uploadPost",upload,(req,res)=>{
             }
             console.log(results);
             res.render("claimPage.ejs",{results});
-
         })
 
        
@@ -294,13 +293,48 @@ app.post("/uploadPost",upload,(req,res)=>{
                 return; // Make sure to return here to prevent further execution
             }
             // Redirect only if there was no error
-            res.redirect("/claimHistory");
+            res.redirect("/claimRequest");
         });
     });
+    app.get("/claimRequest", async (req, res) => {
+        if (!req.session.userId) {
+            // Handle the case where the user is not logged in
+            return res.status(401).send("You must be logged in to view this page.");
+        }
+    
+        try {
+            const query = `
+                SELECT posts.post_picture, posts.post_content, Claims.claim_status, Claims.address_lost, Claims.specific_question
+                FROM Claims
+                JOIN posts ON Claims.post_id = posts.post_id
+                WHERE Claims.claimer_id = ?;
+            `;
+            let claimsData = await new Promise((resolve, reject) => {
+                connection.query(query, [req.session.userId], (err, results) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        console.log(results)
+                        resolve(results);
+                    }
+                });
+            });
+    
+            // Check if any data was returned
+            if (claimsData.length === 0) {
+                res.send("No claims found for the current user.");
+            } else {
+              
+                res.render("claimRequests.ejs", { claims: claimsData });
+            }
+        } catch (error) {
+            console.error('Error fetching claim requests', error);
+            res.status(500).send("Error fetching claim requests");
+        }
+    });
+    
 
 
-
- 
 
     
 

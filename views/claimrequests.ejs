@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claim Requests History</title>
+    <style>
+        :root {
+            --blue: #2C3E50;
+            --indigo: #6610f2;
+            --purple: #6f42c1;
+            --pink: #e83e8c;
+            --red: #E74C3C;
+            --orange: #fd7e14;
+            --yellow: #F39C12;
+            --green: #18BC9C;
+            --teal: #20c997;
+            --cyan: #3498DB;
+            --white: #fff;
+            --gray: #95a5a6;
+            --gray-dark: #343a40;
+            --primary: #2C3E50;
+            --secondary: #95a5a6;
+            --success: #18BC9C;
+            --info: #3395d7;
+            --warning: #F39C12;
+            --danger: #E74C3C;
+            --light: #ecf0f1;
+            --dark: #FFFFFF;
+            --font-family-sans-serif: "Lato", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-family-sans-serif);
+            background-color: var(--light);
+            color: var(--gray-dark);
+        }
+
+        .container {
+            width: 90%;
+            margin: 20px auto;
+        }
+
+        .card {
+            background-color: var(--white);
+            border: 1px solid var(--secondary);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .card img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .status {
+            padding: 5px 10px;
+            color: var(--primary);
+            border:1px solid black;
+            display: inline-block;
+
+        }
+
+        .success { background-color: var(--success); }
+        .info { background-color: var(--info); }
+        .warning { background-color: var(--warning); }
+        .danger { background-color: var(--danger); }
+
+        .title {
+            color: var(--primary);
+            font-size: 1.5em;
+        }
+
+        .date-claimed {
+            font-style: italic;
+            color: var(--secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <% if (claims.length > 0) { %>
+            <% claims.forEach(function(claim) { %>
+                <div class="card">
+                    <img src="<%= claim.post_picture %>" alt="Item Image">
+                    <div class="title"><%= claim.post_content %></div>
+                    <div class="status <%= claim.claim_status.toLowerCase() %>"><%= claim.claim_status %></div>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <p>No claims found for the current user.</p>
+        <% } %>
+    </div>
+</body>
+</html>
