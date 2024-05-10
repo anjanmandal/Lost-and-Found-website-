@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Claim Requests History</title>
+    <title>User Claims</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root {
             --blue: #2C3E50;
@@ -27,7 +28,6 @@
             --danger: #E74C3C;
             --light: #ecf0f1;
             --dark: #FFFFFF;
-            --font-family-sans-serif: "Lato", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
 
         body {
@@ -37,8 +37,7 @@
         }
 
         .container {
-            width: 90%;
-            margin: 20px auto;
+            padding: 20px;
         }
 
         .card {
@@ -56,77 +55,31 @@
             border-radius: 8px;
         }
 
-        .status {
-            width: 60px;
-            margin-top: 10px;
-            padding: 5px;
-            background-color: var(--primary);
-            color: var(--white);
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .success { background-color: var(--success); }
-        .info { background-color: var(--info); }
-        .warning { background-color: var(--warning); }
-        .danger { background-color: var(--danger); }
-
-        .title {
-            color: var(--primary);
-            font-size: 1.5em;
-        }
-
-        .details, .chat-button {
+        .details {
             display: none;
             font-size: 0.9em;
             padding-top: 10px;
         }
 
-        button {
-            margin-top: 10px;
-            padding: 5px 15px;
+        button.toggle-details {
             background-color: var(--primary);
             color: var(--white);
             border: none;
             border-radius: 5px;
+            padding: 5px 10px;
             cursor: pointer;
         }
-        #chat-button{
-           position: relative;
-           left:50px;
-        }
-        
-     
 
-        button:hover {
+        button.toggle-details:hover {
             background-color: var(--dark);
         }
 
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+        form.status-form {
+            margin-top: 10px;
         }
 
-        .modal {
-            background-color: var(--white);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            text-align: center;
-            width: 300px;
-        }
-
-        .modal button {
-            margin-top: 15px;
+        select {
+            margin-right: 10px;
         }
     </style>
 </head>
@@ -137,29 +90,25 @@
                 <div class="card">
                     <img src="<%= claim.post_picture %>" alt="Item Image">
                     <div class="title"><%= claim.post_content %></div>
-                    <div class="status <%= claim.claim_status.toLowerCase() %>"><%= claim.claim_status %></div>
-                    <button onclick="toggleDetails(this)">Details</button>
+                    <button class="toggle-details" onclick="toggleDetails(this)">Toggle Details</button>
                     <div class="details">
                         <p><strong>Address Lost:</strong> <%= claim.address_lost %></p>
                         <p><strong>Specific Question:</strong> <%= claim.specific_question %></p>
                     </div>
-                    <% if (claim.claim_status === 'Accepted') { %>
-                        <button id="chat-button" onclick="showChatModal()">Chat</button>
-                    <% } %>
+                    <form class="status-form" method="POST" action="/updateClaimStatus">
+                        <input type="hidden" name="claim_id" value="<%= claim.claim_id %>">
+                        <select name="new_status">
+                            <option value="Accepted">Accept</option>
+                            <option value="Rejected">Reject</option>
+                        </select>
+                        <button type="submit">Update Status</button>
+                    </form>
                 </div>
             <% }); %>
         <% } else { %>
             <p>No claims found for the current user.</p>
         <% } %>
     </div>
-
-    <div class="overlay" id="chatModal">
-        <div class="modal">
-            <p>Congratulations! Your claim request is accepted.</p>
-            <button onclick="startChatSession()">Start Chat</button>
-        </div>
-    </div>
-
     <script>
         function toggleDetails(button) {
             var detailsDiv = button.nextElementSibling;
@@ -168,17 +117,6 @@
             } else {
                 detailsDiv.style.display = 'block';
             }
-        }
-
-        function showChatModal() {
-            document.getElementById('chatModal').style.display = 'flex';
-        }
-
-        function startChatSession() {
-            document.getElementById('chatModal').style.display = 'none';
-            // Implement chat session logic here
-            // For example, redirect or fetch to start chat session
-            console.log("Chat session would start here.");
         }
     </script>
 </body>

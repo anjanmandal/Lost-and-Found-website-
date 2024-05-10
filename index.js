@@ -256,6 +256,7 @@ app.post("/uploadPost",upload,(req,res)=>{
 
 
     });
+    //-------------------------CLAIM AND CLAIM HISTORY------------------------------------
     app.post("/claim",(req,res)=>{
         if(!req.session.userId){
             return res.redirect("/login");
@@ -296,7 +297,7 @@ app.post("/uploadPost",upload,(req,res)=>{
             res.redirect("/claimRequest");
         });
     });
-    app.get("/claimRequest", async (req, res) => {
+    app.get("/claimHistory", async (req, res) => {
         if (!req.session.userId) {
             // Handle the case where the user is not logged in
             return res.status(401).send("You must be logged in to view this page.");
@@ -332,7 +333,68 @@ app.post("/uploadPost",upload,(req,res)=>{
             res.status(500).send("Error fetching claim requests");
         }
     });
-    
+    app.get("/claim",(req,res)=>{
+        res.redirect("/claimHistory")
+    })
+
+    //---------------------CLAIM REQUEST---------------------------------
+
+        app.get("/claimRequests", async (req, res) => {
+            if (!req.session.userId) {
+                return res.status(401).send("You must be logged in to view this page.");
+            }
+        
+            try {
+                const userId = req.session.userId; // Or from a request parameter, etc.
+                const query = `
+                    SELECT 
+                        posts.post_picture, 
+                        posts.post_content, 
+                        Claims.claim_status, 
+                        Claims.claim_id,
+                        Claims.address_lost, 
+                        Claims.specific_question
+                    FROM 
+                        Claims
+                    JOIN 
+                        posts ON Claims.post_id = posts.post_id
+                    JOIN 
+                        list ON posts.user_id = list.user_id
+                    WHERE 
+                        list.user_id = ?;
+                `;
+        
+                let results = await new Promise((resolve, reject) => {
+                    connection.query(query, [userId], (err, results) => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve(results);
+                        }
+                    });
+                });
+        
+                res.render("userClaims.ejs", { claims: results });
+            } catch (error) {
+                console.error('Error fetching user claims', error);
+                res.status(500).send("Error fetching user claims");
+            }
+        });
+
+        app.post("/updateClaimStatus",(req,res)=>{
+            let {claim_id,new_status}=req.body;
+             let sql=`UPDATE Claims
+                      SET claim_status=?
+                      WHERE claim_id=?`;
+            connection.query(sql,[new_status,claim_id],(err,results)=>{
+                res.redirect("/submit-your-login-form")
+            })
+
+        })
+
+
+
+
 
 
 
